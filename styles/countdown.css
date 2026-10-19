@@ -1,0 +1,276 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+}
+
+#contentArea {
+    flex: 1;
+    /* fill remaining space under heading */
+    display: flex;
+    justify-content: center;
+    /* vertical centring */
+    align-items: center;
+    /* horizontal centring */
+    width: 100%;
+}
+
+#container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    backdrop-filter: brightness(1.0);
+}
+
+#mainHeading {
+    width: 100%;
+    text-align: center;
+    font-size: 5em;
+    color: red;
+    text-shadow: 3px 3px 6px black;
+    margin: 20px 0;
+}
+
+.timer {
+    text-align: center;
+    padding: 20px;
+    flex: 1 1 auto;
+    min-width: 280px;
+    /* prevents panels becoming too narrow */
+    color: yellow;
+    text-shadow: 2px 2px 4px black;
+}
+
+.title {
+    font-size: 3em;
+    margin-bottom: 10px;
+    color: yellow;
+}
+
+.location {
+    font-size: 3em;
+    margin-bottom: 10px;
+    color: green;
+}
+
+.days {
+    font-size: 2.2em;
+    margin-bottom: 5px;
+    color: yellow;
+}
+
+.dayhour {
+    font-size: 2.2em;
+    margin-bottom: 5px;
+    color: yellow;
+}
+
+.minsec {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: yellow;
+}
+
+@media (orientation: portrait) {
+    #container {
+        flex-direction: column;
+    }
+}
+
+@media (orientation: landscape) {
+    #container {
+        flex-direction: row;
+    }
+}
+
+.panel {
+    background: rgba(0, 0, 0, 0.45);
+    /* translucent dark panel */
+    border-radius: 20px;
+    /* smooth rounded corners */
+    padding: 25px 35px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    /* deep soft shadow */
+    backdrop-filter: blur(6px);
+    /* frosted glass effect */
+
+    /* NEW: animated glow */
+    animation: glowPulse 4s ease-in-out infinite;
+}
+
+/* Snow container sits behind everything */
+#snowfall {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* snow doesn't block clicks */
+    overflow: hidden;
+    z-index: 0;
+    /* behind panels */
+}
+
+.snowflake {
+    position: absolute;
+    top: -10px;
+    color: white;
+    opacity: 0.9;
+    font-size: 1em;
+    user-select: none;
+    animation-name: fall;
+    animation-timing-function: linear;
+}
+
+/* Shared snow layer base */
+#snow-back,
+#snow-mid,
+#snow-front {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#snow-back .snowflake {
+    --fade-strength: var(--fade-strength-back);
+    animation: fadeSnow 4s ease-in-out infinite;
+}
+
+#snow-mid .snowflake {
+    --fade-strength: var(--fade-strength-mid);
+    animation: fadeSnow 5s ease-in-out infinite;
+}
+
+#snow-front .snowflake {
+    --fade-strength: var(--fade-strength-front);
+    animation: fadeSnow 6s ease-in-out infinite;
+}
+
+
+/* Depth ordering */
+#snow-back {
+    z-index: 0;
+    filter: blur(2px);
+    opacity: 0.5;
+    transform: scale(0.6);
+    /* faint */
+}
+
+#snow-mid {
+    z-index: 1;
+    filter: blur(1px);
+    opacity: 0.75;
+    transform: scale(0.85);
+    /* medium */
+}
+
+#snow-front {
+    z-index: 2;
+    filter: blur(0px);
+    opacity: 0.95;
+    transform: scale(1.0);
+    /* sharp */
+}
+
+/* Snowflake base style */
+.snowflake {
+    position: absolute;
+    top: -10px;
+    color: white;
+    user-select: none;
+    opacity: 0.9;
+    animation-name: fallDepth;
+    animation-timing-function: linear;
+}
+
+:root {
+    --wind-gust: 0px;
+    --fade-strength-back: 0.4;
+    --fade-strength-mid: 0.2;
+    --fade-strength-front: 0.05;
+}
+
+/* Ground snow */
+#snow-ground {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    /* grows over time */
+    overflow: visible;
+    pointer-events: none;
+    z-index: 3;
+    /* above background, below panels */
+}
+
+.ground-flake {
+    position: absolute;
+    bottom: 0;
+    color: white;
+    opacity: 0.9;
+    user-select: none;
+    font-size: 12px;
+    filter: blur(1px);
+}
+
+@keyframes fadeSnow {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: var(--fade-strength);
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fallDepth {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+
+    100% {
+        transform: translateY(110vh) translateX(calc(var(--drift) + var(--wind-gust)));
+    }
+}
+
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 0px rgba(255, 255, 255, 0.0);
+    }
+
+    50% {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 25px rgba(255, 255, 255, 0.55);
+    }
+
+    100% {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6),
+            0 0 0px rgba(255, 255, 255, 0.0);
+    }
+}
