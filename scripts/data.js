@@ -19,7 +19,7 @@ const DEFAULT_TRIPS = [
         name: "January Jaunt",
         location: "Flaine, France",
         enabled: true,
-        departure: "2027-01-16T05:30:00",
+        departure: "2027-01-16T00:00:00",
         sortOrder: 2
     },
     {
@@ -27,7 +27,7 @@ const DEFAULT_TRIPS = [
         name: "March Mega Bash",
         location: "Les Arcs, France",
         enabled: true,
-        departure: "2027-03-13T06:10:00",
+        departure: "2027-03-13T00:00:00",
         sortOrder: 3
     }
 ];
