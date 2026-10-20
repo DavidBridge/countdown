@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Trip Settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="styles/settings.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .trip-row {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .trip-row label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .trip-row input[type="text"],
+        .trip-row input[type="datetime-local"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .buttons {
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        #saveBtn {
+            background: #0078d4;
+            color: white;
+        }
+
+        #resetBtn {
+            background: #d40000;
+            color: white;
+        }
+
+        #backBtn {
+            background: #555;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Trip Settings</h1>
+
+    <p>Edit your trip details below. These settings are saved locally on your device.</p>
+
+    <div id="settingsContainer"></div>
+
+    <div class="buttons">
+        <button id="saveBtn" onclick="saveSettings()">Save Changes</button>
+        <button id="resetBtn" onclick="resetToDefaults()">Reset to Defaults</button>
+        <button id="backBtn" onclick="goBack()">Back to Countdown</button>
+    </div>
+
+    <script src="scripts/data.js"></script>
+    <script src="scripts/settings.js"></script>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/countdown/service-worker.js");
+        }
+    </script>
+
+
+</body>
+
+</html>

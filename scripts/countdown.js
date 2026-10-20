@@ -1,217 +1,170 @@
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
+// ------------------------------------------------------------
+// Countdown Page Logic
+// ------------------------------------------------------------
+
+// Load user-specific trips (or defaults if first run)
+const trips = loadUserTrips()
+    .filter(t => t.enabled)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+
+// ------------------------------------------------------------
+// Render trip cards dynamically
+// ------------------------------------------------------------
+function renderTrips() {
+    const container = document.getElementById("tripContainer");
+    container.innerHTML = "";
+
+    //enrichTrips(); // compute dynamic fields
+
+    trips.forEach(trip => {
+
+        const card = document.createElement("div");
+        card.className = "trip-card";
+        card.dataset.id = trip.id;
+
+        const target = new Date(trip.departure);
+        const departureLocal = target.toLocaleString("en-GB", {
+            dateStyle: "short",
+            timeStyle: "medium"
+        });
+
+        card.innerHTML = `
+            <div class="trip-name">${trip.name}</div>
+            <div class="trip-location">${trip.location}</div>
+            <div class="trip-days">${trip.days} days</div>
+            <div class="trip-hhmm">${trip.hhmm}</div>
+            <div class="trip-departure">${departureLocal}</div>
+        `;
+
+        container.appendChild(card);
+    });
 }
 
-const BACKGROUND_IMAGE = "./assets/background.png";
-let TRIPS = [];
 
-function loadTrips() {
-    const raw = document.getElementById("tripData").textContent;
-    TRIPS = JSON.parse(raw);
-
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-}
-
-// Set background image safely after page loads
-window.addEventListener("load", () => {
-    document.body.style.backgroundImage = `url('${BACKGROUND_IMAGE}')`;
-});
-
-// Hide a trip panel entirely
-function hideTrip(i) {
-    document.getElementById("title" + (i + 1)).parentElement.style.display = "none";
-}
-
-function updateCountdown() {
+function updateCountdowns() {
     const now = new Date();
 
-    for (let i = 0; i < TRIPS.length; i++) {
+    trips.forEach(trip => {
+        const target = new Date(trip.departure);
 
-        const trip = TRIPS[i];
+        const card = document.querySelector(`.trip-card[data-id="${trip.id}"]`);
+        if (!card) return;
 
-        // Skip trip if any required field is blank
-        if (!trip.title || !trip.location || !trip.date || !trip.departure) {
-            hideTrip(i);
-            continue;
+        const daysEl = card.querySelector(".trip-days");
+        const hhmmEl = card.querySelector(".trip-hhmm");
+
+        // 1. Calendar day difference (ignoring time-of-day)
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const depDay = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+
+        let days = Math.floor((depDay - today) / (1000 * 60 * 60 * 24));
+
+        // 2. Time-of-day difference between "now" and departure time,
+        //    assuming SAME local offset (ignoring future GMT/BST change)
+        const nowSeconds =
+            now.getHours() * 3600 +
+            now.getMinutes() * 60 +
+            now.getSeconds();
+
+        const targetSeconds =
+            target.getHours() * 3600 +
+            target.getMinutes() * 60 +
+            target.getSeconds();
+
+        let timeDiffSeconds = targetSeconds - nowSeconds;
+
+        // If the departure time is "earlier" in the day than now,
+        // then one of the calendar days is effectively consumed by the time part.
+        if (timeDiffSeconds < 0) {
+            timeDiffSeconds += 24 * 3600; // wrap to next day
+            days -= 1;                    // one day less in the "whole days" count
         }
 
-        const target = new Date(trip.date + "T" + trip.departure);
-        const diff = target - now;
-
-        if (diff <= 0) {
-            document.getElementById("dayhour" + (i + 1)).textContent = "0 days, 0 hours";
-            document.getElementById("minsec" + (i + 1)).textContent = "00:00";
-            continue;
+        // If we've passed the departure moment
+        if (days < 0 || timeDiffSeconds < 0) {
+            daysEl.textContent = "0 days";
+            hhmmEl.textContent = "00:00:00";
+            return;
         }
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const hours = Math.floor(timeDiffSeconds / 3600);
+        const mins = Math.floor((timeDiffSeconds % 3600) / 60);
+        const secs = timeDiffSeconds % 60;
 
-        const mm = String(minutes).padStart(2, "0");
-        const ss = String(seconds).padStart(2, "0");
+        trip.hhmm = `+ ${String(hours)} hours, ${String(mins)} minutes and ${String(secs)} seconds`;
 
-        document.getElementById("title" + (i + 1)).textContent = trip.title;
-        document.getElementById("location" + (i + 1)).textContent = trip.location;
-        document.getElementById("days" + (i + 1)).textContent = `${days} days`;
-        document.getElementById("daytime" + (i + 1)).textContent = `+ ${hours} hours ${mm} minutes ${ss} seconds`;
-    }
-}
-
-function startSnowfallDepthPhysics() {
-
-    const layers = {
-        back: { speed: 0.5, drift: 0.2 },
-        mid: { speed: 1.0, drift: 0.5 },
-        front: { speed: 1.8, drift: 1.0 }
-    };
-
-    let wind = 0;          // current wind force
-    let windTarget = 0;    // target wind force
-
-    // Smooth wind update
-    function updateWind() {
-        wind += (windTarget - wind) * 0.02;
-        requestAnimationFrame(updateWind);
-    }
-
-    updateWind();
-
-    // Wind gust generator
-    function triggerGust() {
-        windTarget = (Math.random() * 4 - 2);   // -2 to +2 sideways force
-        setTimeout(() => windTarget = 0, 2000 + Math.random() * 3000);
-    }
-
-    setInterval(triggerGust, 3000 + Math.random() * 5000);
-
-    // Create flakes
-    function createFlake(layerName) {
-
-        const FLAKE_SHAPES = ["❄", "❅", "✻", "✼", "❉", "✥", "✧"];
-
-        // Random rotation speed and direction
-        const rotationSpeed = (Math.random() * 0.04 + 0.01) * (Math.random() < 0.5 ? -1 : 1);
-        let rotationAngle = Math.random() * 360;
-
-        const layer = layers[layerName];
-
-        const flake = document.createElement("div");
-        flake.classList.add("snowflake");
-        flake.textContent = FLAKE_SHAPES[Math.floor(Math.random() * FLAKE_SHAPES.length)];
-        // Random fade offset so flakes don't pulse in sync
-        flake.style.animationDelay = (Math.random() * 3) + "s";
-
-        const size = 8 + Math.random() * 20;
-        flake.style.fontSize = size + "px";
-
-        const x = Math.random() * window.innerWidth;
-        const y = -20;
-
-        const drift = (Math.random() * 2 - 1) * layer.drift;
-        const flakeObj = {
-            el: flake,
-            x,
-            y,
-            drift,
-            layer,
-            rotationAngle,
-            rotationSpeed
-        };
-
-        // Optional: shape‑dependent tweaks
-        if (flake.textContent === "✻" || flake.textContent === "✼") {
-            flake.style.opacity = 0.85;
-        }
-        if (flake.textContent === "✧") {
-            flake.style.opacity = 0.6;
-            flake.style.fontSize = (size * 0.8) + "px";
-        }
-
-        document.getElementById("snow-" + layerName).appendChild(flake);
-
-        flakes.push(flakeObj);
-    }
-
-    const flakes = [];
-
-    // Create flakes continuously
-    setInterval(() => createFlake("back"), 400);
-    setInterval(() => createFlake("mid"), 250);
-    setInterval(() => createFlake("front"), 150);
-
-    // Physics update loop
-    function updateFlakes() {
-        for (const f of flakes) {
-            f.y += f.layer.speed;                 // fall speed
-            f.x += f.drift + wind * f.layer.drift; // sideways movement
-
-            f.rotationAngle += f.rotationSpeed * (f.layer.drift + Math.abs(wind) * 0.3);  // depth-aware rotation
-            if (f.el.textContent === "❄" || f.el.textContent === "❅") {
-                f.rotationAngle += f.rotationSpeed * 0.7;
-            } else {
-                f.rotationAngle += f.rotationSpeed * 1.2;
-            }
-            f.rotationAngle += (Math.sin(f.y * 0.01) * 0.2);
-
-
-
-            f.el.style.transform = `translate(${f.x}px, ${f.y}px) rotate(${f.rotationAngle}deg)`;
-
-            // Remove flakes that fall off screen, building up the accumulation layer at the bottom
-            if (f.y > window.innerHeight - 10) {
-                // Add a ground flake at the landing position
-                addGroundFlake(f.x);
-
-                // Remove falling flake
-                f.el.remove();
-                flakes.splice(flakes.indexOf(f), 1);
-            }
-
-        }
-
-        requestAnimationFrame(updateFlakes);
-    }
-
-    updateFlakes();
+        daysEl.textContent = `${days} days`;
+        hhmmEl.textContent = `+ ${String(hours)} hours, ${String(mins)} minutes and ${String(secs)} seconds`;
+        // `${String(hours).padStart(2, "0")}:` +
+        // `${String(mins).padStart(2, "0")}:` +
+        // `${String(secs).padStart(2, "0")}`;
+    });
 }
 
 
-function addGroundFlake(x) {
-    const flake = document.createElement("div");
-    flake.classList.add("ground-flake");
 
-    // Random small shapes
-    const shapes = ["❄", "❅", "✻", "✼", "❉"];
-    flake.textContent = shapes[Math.floor(Math.random() * shapes.length)];
 
-    // Random slight size variation
-    flake.style.fontSize = (8 + Math.random() * 6) + "px";
 
-    // Place at bottom
-    flake.style.left = x + "px";
 
-    document.getElementById("snow-ground").appendChild(flake);
-}
+// ------------------------------------------------------------
+// Compute and update countdowns every second
+// ------------------------------------------------------------
+// function updateCountdowns() {
+//     const now = new Date();
 
-function growGroundLayer() {
-    const ground = document.getElementById("snow-ground");
-    const currentHeight = parseFloat(getComputedStyle(ground).height);
+//     trips.forEach(trip => {
+//         const target = new Date(trip.departure);
+//         const diff = target - now;
 
-    // Cap height at 120px
-    if (currentHeight < 120) {
-        ground.style.height = (currentHeight + 0.05) + "px";
-    }
+//         const daysEl = document.querySelector(`.trip-card[data-id="${trip.id}"] .trip-days`);
+//         const hhmmEl = document.querySelector(`.trip-card[data-id="${trip.id}"] .trip-hhmm`);
 
-    requestAnimationFrame(growGroundLayer);
-}
 
-// Load JSON
-loadTrips();
+//         if (diff <= 0) {
+//             trip.days = 0;
+//             trip.hhmm = "00:00:00";
+//             trip.departureLocal = target.toLocaleString();
 
+//             daysEl.textContent = "0";
+//             hhmmEl.textContent = "00:00:00";
+//             return;
+//         }
+
+//         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+//         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+//         const mins = Math.floor((diff / (1000 * 60)) % 60);
+//         const secs = Math.floor((diff / 1000) % 60);
+
+//         trip.days = `${String(days)} days`;
+//         trip.hhmm = `+ ${String(hours)} hours, ${String(mins)} minutes and ${String(secs)} seconds`;
+
+//         // Update DOM
+//         daysEl.textContent = trip.days;
+//         hhmmEl.textContent = trip.hhmm;
+//     });
+// }
+
+
+// ------------------------------------------------------------
+// Initialise page
+// ------------------------------------------------------------
+
+// Set a full page background image
 window.addEventListener("load", () => {
-    startSnowfallDepthPhysics();
-    growGroundLayer();
+    document.body.style.backgroundImage = `url('${DEFAULT_BACKGROUND}')`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
 });
+
+renderTrips();
+setInterval(updateCountdowns, 1000);
+
+
+// ------------------------------------------------------------
+// Navigation to settings page
+// ------------------------------------------------------------
+function openSettings() {
+    window.location.href = "settings.html";
+}
