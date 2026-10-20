@@ -1,10 +1,9 @@
 // ------------------------------------------------------------
-// Trip Countdown PWA Service Worker
+// Trip Countdown PWA Service Worker (Corrected Version)
 // ------------------------------------------------------------
 
-const CACHE_NAME = "trip-countdown-v1.01";
+const CACHE_NAME = "trip-countdown-v2";   // bump this on every update
 
-// All static assets required for offline operation
 const ASSETS = [
     "/countdown/",
     "/countdown/index.html",
@@ -21,23 +20,20 @@ const ASSETS = [
     "/countdown/assets/icon-192.png",
     "/countdown/assets/icon-512.png",
     "/countdown/assets/background.png"
-
 ];
 
 // ------------------------------------------------------------
-// Install: cache all static assets
+// Install: cache assets and activate immediately
 // ------------------------------------------------------------
 self.addEventListener("install", event => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll(ASSETS);
-        })
+        caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
     );
     self.skipWaiting();
 });
 
 // ------------------------------------------------------------
-// Activate: clean up old caches
+// Activate: delete old caches
 // ------------------------------------------------------------
 self.addEventListener("activate", event => {
     event.waitUntil(
@@ -53,12 +49,12 @@ self.addEventListener("activate", event => {
 });
 
 // ------------------------------------------------------------
-// Fetch: network-first for HTML, cache-first for everything else
+// Fetch: network-first for HTML, stale-while-revalidate for others
 // ------------------------------------------------------------
 self.addEventListener("fetch", event => {
     const request = event.request;
 
-    // HTML pages → network-first (ensures updates)
+    // HTML navigation → network-first
     if (request.mode === "navigate") {
         event.respondWith(
             fetch(request).catch(() => caches.match("/countdown/index.html"))
@@ -66,18 +62,17 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    // Static assets → cache-first
+    // CSS/JS/JSON/images → stale-while-revalidate
     event.respondWith(
         caches.match(request).then(cached => {
-            return (
-                cached ||
-                fetch(request).then(response => {
-                    return caches.open(CACHE_NAME).then(cache => {
-                        cache.put(request, response.clone());
-                        return response;
-                    });
-                })
-            );
+            const networkFetch = fetch(request).then(response => {
+                caches.open(CACHE_NAME).then(cache => {
+                    cache.put(request, response.clone());
+                });
+                return response;
+            });
+
+            return cached || networkFetch;
         })
     );
 });
