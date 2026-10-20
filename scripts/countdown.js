@@ -1,3 +1,11 @@
+/* -----------------------------------------------------------------------------
+  Author: David Bridge
+  Last updated: 2026-10-20
+  Manages the content in the index.html page. 
+  The page initially called countdown.html until I made it into a 
+  Packaged Web Application (PWA) which require index.html for GitHub pages
+----------------------------------------------------------------------------- */
+
 // ------------------------------------------------------------
 // Countdown Page Logic
 // ------------------------------------------------------------

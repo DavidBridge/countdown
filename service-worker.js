@@ -1,8 +1,10 @@
-// ------------------------------------------------------------
-// Trip Countdown PWA Service Worker (Corrected Version)
-// ------------------------------------------------------------
+/* --------------------------------------------------------
+  Author: David Bridge
+  Last updated: 2026-10-20
+  Countdown PWA Service Worker
+--------------------------------------------------------- */
 
-const CACHE_NAME = "trip-countdown-v4";   // bump this on every update
+const CACHE_NAME = "trip-countdown-v5";   // bump this on every update
 
 const ASSETS = [
     "/countdown/",
@@ -13,9 +15,11 @@ const ASSETS = [
     "/countdown/scripts/data.js",
     "/countdown/scripts/countdown.js",
     "/countdown/scripts/settings.js",
+    "/countdown/scripts/snow.js",
 
     "/countdown/styles/countdown.css",
     "/countdown/styles/settings.css",
+    "/countdown/styles/snow.css",
 
     "/countdown/assets/icon-192.png",
     "/countdown/assets/icon-512.png",

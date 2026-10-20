@@ -1,22 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- ==============================================================================
+Project: Countdown PWA
+Author:  David Bridge
+Version: v5, Last Updated: 2026-10-20
+Notes:
+- Main entry point for the PWA.
+- Cached assets are managed in service-worker.js.
+- Update CACHE_NAME when changing cached resources.
+============================================================================== -->
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>Countdown to winter fun!</title>
+    <title>Countdown | Travel Countdown PWA</title>
+    <meta name="author" content="David Bridge. David Bridge Technology Limited.">
+    <meta name="application-name" content="Countdown">
+    <meta name="description"
+        content="Progressive Web App for managing and tracking countdown for multiple travel plans">
+    <meta name="repository" content="https://github.com/davidbridge/countdown">
+    <link rel="canonical" href="https://davidbridge.github.io/countdown/">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Countdown">
+    <meta name="version" content="v5">
+
+
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="styles/countdown_responsive.css">
+    <link rel="stylesheet" href="styles/countdown.css">
     <link rel="stylesheet" href="styles/snow.css">
 </head>
 
 <body>
+    <!-- snow effects -->
     <div id="snow-back"></div>
     <div id="snow-mid"></div>
     <div id="snow-front"></div>
     <div id="snow-ground"></div>
 
+    <!-- Countdown cards container -->
     <div id="page">
         <h1 id="mainHeading">Countdown to winter fun!</h1>
         <div id="contentArea">
@@ -26,17 +49,19 @@
         </div>
     </div>
 
+    <!-- Floating settings button -->
     <button id="openSettings">Settings</button>
 
     <script src="scripts/data.js"></script>
     <script src="scripts/countdown.js"></script>
-    <script src="scripts/snow2.js"></script>
+    <script src="scripts/snow.js"></script>
 
     <script>
+        // Register service worker
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("/countdown/service-worker.js");
         }
-
+        // Wire up the settings navigation button
         document.getElementById("openSettings").addEventListener("click", () => {
             window.location.href = "settings.html";
         });

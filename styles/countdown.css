@@ -1,56 +1,129 @@
+/* --------------------------------------------------------
+  Author: David Bridge
+  Last updated: 2026-10-20
+  CSS for page content
+-------------------------------------------------------- */
+
+/* --- GLOBAL --- */
+
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    height: 100vh;
+    height: 100dvh;
+    /* dynamic viewport */
     box-sizing: border-box;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-attachment: scroll;
 }
+
+/* --- PAGE LAYOUT --- */
 
 #page {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
 }
 
 #contentArea {
     flex: 1;
-    /* fill remaining space under heading */
     display: flex;
     justify-content: center;
-    /* vertical centring */
     align-items: center;
-    /* horizontal centring */
     width: 100%;
 }
 
-#container {
+/* --- TRIP CONTAINER (RESTORED) --- */
+
+#tripContainer {
     display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: space-around;
-    align-items: center;
     flex-wrap: wrap;
-    backdrop-filter: brightness(1.0);
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
 }
+
+/* --- TRIP CARD (RESTORED + RESPONSIVE) --- */
+
+.trip-card {
+    background: rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(3px);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+
+    /* responsive flex behaviour */
+    flex: 1 1 clamp(280px, 80vw, 500px);
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    text-shadow:
+        0 0 3px rgba(0, 0, 0, 0.6),
+        0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+/* --- TYPOGRAPHY (RESPONSIVE) --- */
 
 #mainHeading {
     width: 100%;
     text-align: center;
-    font-size: 6em;
+    font-size: clamp(2rem, 6vw, 4rem);
     color: red;
     text-shadow: 3px 3px 6px black;
     margin: 20px 0;
 }
 
+.trip-name {
+    font-size: clamp(1.6rem, 5vw, 3rem);
+    margin-bottom: 10px;
+    color: yellow;
+}
+
+.trip-location {
+    font-size: clamp(1.3rem, 3vw, 2rem);
+    margin-bottom: 10px;
+    color: #9fffd0;
+}
+
+.trip-days {
+    font-size: clamp(1.2rem, 4vw, 2.2rem);
+    margin-bottom: 5px;
+    color: yellow;
+}
+
+.trip-hhmm {
+    font-size: clamp(1rem, 3.5vw, 1.6rem);
+    margin-bottom: 5px;
+    color: yellow;
+}
+
+.trip-departure {
+    font-size: clamp(1rem, 1.0vw, 1.4rem);
+    margin-bottom: 5px;
+    color: #9fffd0;
+}
+
+/* --- TIMER PANEL --- */
+
+.timer {
+    text-align: center;
+    padding: 20px;
+    flex: 1 1 300px;
+    min-width: 260px;
+    color: yellow;
+    text-shadow: 2px 2px 4px black;
+}
+
+/* --- SETTINGS BUTTON --- */
+
 #openSettings {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: calc(20px + env(safe-area-inset-left));
     padding: 10px 16px;
     font-size: 16px;
     background: #0078d4;
@@ -59,76 +132,33 @@ body {
     border-radius: 6px;
     cursor: pointer;
     z-index: 1000;
-    /* above snow */
 }
 
+/* --- BREAKPOINTS --- */
 
-#tripContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    /* or space-between */
-    padding: 20px;
+/* Phones (S25 Ultra) */
+@media (max-width: 600px) {
+    #tripContainer {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
-.trip-card {
-    background: rgba(0, 0, 0, 0.22);
-    /* translucent overlay */
-    backdrop-filter: blur(3px);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    color: white;
-    flex: 1 1 500px;
-    /* minimum width */
-    max-width: 600px;
-    text-shadow:
-        0 0 3px rgba(0, 0, 0, 0.6),
-        0 0 6px rgba(0, 0, 0, 0.4);
+/* Tablets */
+@media (min-width: 601px) and (max-width: 1024px) {
+    #tripContainer {
+        justify-content: space-around;
+    }
 }
 
-
-
-.timer {
-    text-align: center;
-    padding: 20px;
-    flex: 1 1 auto;
-    min-width: 280px;
-    /* prevents panels becoming too narrow */
-    color: yellow;
-    text-shadow: 2px 2px 4px black;
+/* Desktop */
+@media (min-width: 1025px) {
+    #tripContainer {
+        justify-content: space-evenly;
+    }
 }
 
-.trip-name {
-    font-size: 3em;
-    margin-bottom: 10px;
-    color: yellow;
-}
-
-.trip-location {
-    font-size: 3em;
-    margin-bottom: 10px;
-    color: #4de2c5;
-}
-
-.trip-days {
-    font-size: 2.2em;
-    margin-bottom: 5px;
-    color: yellow;
-}
-
-.trip-hhmm {
-    font-size: 1.6em;
-    margin-bottom: 5px;
-    color: yellow;
-}
-
-.trip-departure {
-    font-size: 1.5em;
-    margin-bottom: 5px;
-    color: #4de2c5;
-}
+/* --- ORIENTATION (kept) --- */
 
 @media (orientation: portrait) {
     #container {
@@ -142,34 +172,38 @@ body {
     }
 }
 
+@media (max-width: 480px) {
+    #tripContainer {
+        flex-direction: column;
+    }
+
+    .trip-card {
+        flex: 1 1 auto;
+        max-width: 100%;
+    }
+}
+
+/* --- PANEL ANIMATION --- */
+
 .panel {
     background: rgba(0, 0, 0, 0.45);
-    /* translucent dark panel */
     border-radius: 20px;
-    /* smooth rounded corners */
     padding: 25px 35px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
-    /* deep soft shadow */
     backdrop-filter: blur(6px);
-    /* frosted glass effect */
-
-    /* NEW: animated glow */
     animation: glowPulse 4s ease-in-out infinite;
 }
 
 @keyframes glowPulse {
     0% {
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6),
-            0 0 0px rgba(255, 255, 255, 0.0);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 0px rgba(255, 255, 255, 0.0);
     }
 
     50% {
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6),
-            0 0 25px rgba(255, 255, 255, 0.55);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 255, 255, 0.55);
     }
 
     100% {
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6),
-            0 0 0px rgba(255, 255, 255, 0.0);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 0px rgba(255, 255, 255, 0.0);
     }
 }

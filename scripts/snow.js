@@ -1,22 +1,77 @@
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-}
+/* --------------------------------------------------------
+  Author David Bridge 
+  Last updated: 2026-10-20
+  Make snow on an HTML page - 
+  Requires snow.css                                      
+  Usage 
+    <link rel="stylesheet" href="styles/snow.css">
+    <script src="scripts/snow.js"></script>*/
+/* --------------------------------------------------------*/
 
-const MAX_FLAKES = 300;
-const MAX_GROUND_FLAKES = 200;
+function startSnowOptimised() {
 
-function startSnowfallDepthPhysics() {
+    let snowEnabled = true;
+
+    const MAX_FLAKES = 250;          // tablet-safe
+    const FLAKE_SHAPES = ["❄", "❅", "✻", "✼", "❉", "✥", "✧", "SH"];
 
     const layers = {
-        back: { speed: 0.5, drift: 0.2 },
-        mid: { speed: 1.0, drift: 0.5 },
-        front: { speed: 1.8, drift: 1.0 }
+        back: { speed: 0.5, drift: 0.2, el: document.getElementById("snow-back") },
+        mid: { speed: 1.0, drift: 0.5, el: document.getElementById("snow-mid") },
+        front: { speed: 1.8, drift: 1.0, el: document.getElementById("snow-front") }
     };
 
-    let wind = 0;          // current wind force
-    let windTarget = 0;    // target wind force
+    const flakes = [];
 
-    // Smooth wind update
+    // Create a pool of flakes (no DOM growth)
+    function initFlakes() {
+        for (let i = 0; i < MAX_FLAKES; i++) {
+            const layerName = i < 80 ? "back" : i < 170 ? "mid" : "front";
+            const layer = layers[layerName];
+
+            const flake = document.createElement("div");
+            flake.classList.add("snowflake");
+            flake.textContent = FLAKE_SHAPES[Math.floor(Math.random() * FLAKE_SHAPES.length)];
+
+            let size = 6 + Math.random() * 18;
+
+            let rotationSpeed = (Math.random() * 0.04 + 0.01) * (Math.random() < 0.5 ? -1 : 1);
+            const shape = FLAKE_SHAPES[Math.floor(Math.random() * FLAKE_SHAPES.length)];
+            flake.textContent = shape;
+            if (shape === "SH") {
+                size = 6 + Math.random() * 10;   // small → medium only
+                flake.style.filter = "blur(1px)"; // slight blur
+            }
+
+            flake.style.fontSize = size + "px";
+
+            flake.style.animation = `fadeSnow ${4 + Math.random() * 4}s ease-in-out infinite`;
+            flake.style.animationDelay = `${Math.random() * 3}s`;
+            flake.style.setProperty("--fade-strength", layerName === "back" ? 0.4 :
+                layerName === "mid" ? 0.2 : 0.05);
+
+            layer.el.appendChild(flake);
+
+
+            flakes.push({
+                el: flake,
+                layer,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                drift: (Math.random() * 2 - 1) * layer.drift,
+                rotation: Math.random() * 360,
+                rotationSpeed: rotationSpeed,
+                fallSpeedFactor: 0.7 + Math.random() * 0.7
+            });
+        }
+    }
+
+    initFlakes();
+
+    // Wind system (lightweight)
+    let wind = 0;
+    let windTarget = 0;
+
     function updateWind() {
         wind += (windTarget - wind) * 0.02;
         requestAnimationFrame(updateWind);
@@ -24,150 +79,63 @@ function startSnowfallDepthPhysics() {
 
     updateWind();
 
-    // Wind gust generator
-    function triggerGust() {
-        windTarget = (Math.random() * 4 - 2);   // -2 to +2 sideways force
+    setInterval(() => {
+        windTarget = (Math.random() * 4 - 2);
         setTimeout(() => windTarget = 0, 2000 + Math.random() * 3000);
-    }
+    }, 3000 + Math.random() * 5000);
 
-    setInterval(triggerGust, 3000 + Math.random() * 5000);
+    // Main animation loop (single RAF)
+    function animate() {
 
-    // Create flakes
-    function createFlake(layerName) {
-        if (flakes.length >= MAX_FLAKES) return;
+        if (!snowEnabled)
+            return;
 
-        const FLAKE_SHAPES = ["❄", "❅", "✻", "✼", "❉", "✥", "✧"];
+        const w = window.innerWidth;
+        const h = window.innerHeight;
 
-        // Random rotation speed and direction
-        const rotationSpeed = (Math.random() * 0.04 + 0.01) * (Math.random() < 0.5 ? -1 : 1);
-        let rotationAngle = Math.random() * 360;
-
-        const layer = layers[layerName];
-
-        const flake = document.createElement("div");
-        flake.classList.add("snowflake");
-        flake.textContent = FLAKE_SHAPES[Math.floor(Math.random() * FLAKE_SHAPES.length)];
-        // Random fade offset so flakes don't pulse in sync
-        flake.style.animationDelay = (Math.random() * 3) + "s";
-
-        const size = 8 + Math.random() * 20;
-        flake.style.fontSize = size + "px";
-
-        const x = Math.random() * window.innerWidth;
-        const y = -20;
-
-        const drift = (Math.random() * 2 - 1) * layer.drift;
-        const flakeObj = {
-            el: flake,
-            x,
-            y,
-            drift,
-            layer,
-            rotationAngle,
-            rotationSpeed
-        };
-
-        // Optional: shape‑dependent tweaks
-        if (flake.textContent === "✻" || flake.textContent === "✼") {
-            flake.style.opacity = 0.85;
-        }
-        if (flake.textContent === "✧") {
-            flake.style.opacity = 0.6;
-            flake.style.fontSize = (size * 0.8) + "px";
-        }
-
-        document.getElementById("snow-" + layerName).appendChild(flake);
-
-        flakes.push(flakeObj);
-    }
-
-    const flakes = [];
-
-    // Create flakes continuously
-    setInterval(() => createFlake("back"), 400);
-    setInterval(() => createFlake("mid"), 250);
-    setInterval(() => createFlake("front"), 150);
-
-    // Physics update loop
-    function updateFlakes() {
         for (const f of flakes) {
 
-            // Cull sideways
-            if (f.x < -50 || f.x > window.innerWidth + 50) {
-                f.el.remove();
-                flakes.splice(flakes.indexOf(f), 1);
-                continue;
+            // Update physics
+            f.y += f.layer.speed * f.fallSpeedFactor;
+            f.x += f.drift + wind * f.layer.drift;
+
+            f.rotation += f.rotationSpeed;
+
+            if (f.el.textContent === "SH") {
+                // clamp rotation so it never flips upside-down
+                if (f.rotation > 20) f.rotation = 20;
+                if (f.rotation < -20) f.rotation = -20;
             }
 
-            f.y += f.layer.speed;                 // fall speed
-            f.x += f.drift + wind * f.layer.drift; // sideways movement
-
-            f.rotationAngle += f.rotationSpeed * (f.layer.drift + Math.abs(wind) * 0.3);  // depth-aware rotation
-            if (f.el.textContent === "❄" || f.el.textContent === "❅") {
-                f.rotationAngle += f.rotationSpeed * 0.7;
-            } else {
-                f.rotationAngle += f.rotationSpeed * 1.2;
+            // Recycle flake when off-screen
+            if (f.y > h) {
+                f.y = -20;
+                f.x = Math.random() * w;
             }
-            f.rotationAngle += (Math.sin(f.y * 0.01) * 0.2);
-
-
-
-            f.el.style.transform = `translate(${f.x}px, ${f.y}px) rotate(${f.rotationAngle}deg)`;
-
-            // Remove flakes that fall off screen, building up the accumulation layer at the bottom
-            if (f.y > window.innerHeight - 10) {
-                // Add a ground flake at the landing position
-                addGroundFlake(f.x);
-
-                // Remove falling flake
-                f.el.remove();
-                flakes.splice(flakes.indexOf(f), 1);
+            if (f.x < -50 || f.x > w + 50) {
+                f.x = Math.random() * w;
+                f.y = -20;
             }
 
+            // GPU transform
+            f.el.style.transform =
+                `translate(${f.x}px, ${f.y}px) rotate(${f.rotation}deg)`;
         }
 
-        requestAnimationFrame(updateFlakes);
+        requestAnimationFrame(animate);
     }
 
-    updateFlakes();
-}
 
-
-function addGroundFlake(x) {
-
-    const ground = document.getElementById("snow-ground");
-    if (ground.children.length >= MAX_GROUND_FLAKES) return;
-
-    const flake = document.createElement("div");
-    flake.classList.add("ground-flake");
-
-    // Random small shapes
-    const shapes = ["❄", "❅", "✻", "✼", "❉"];
-    flake.textContent = shapes[Math.floor(Math.random() * shapes.length)];
-
-    // Random slight size variation
-    flake.style.fontSize = (8 + Math.random() * 6) + "px";
-
-    // Place at bottom
-    flake.style.left = x + "px";
-
-    document.getElementById("snow-ground").appendChild(flake);
-}
-
-function growGroundLayer() {
-    const ground = document.getElementById("snow-ground");
-    const currentHeight = parseFloat(getComputedStyle(ground).height);
-
-    // Cap height at 120px
-    if (currentHeight < 120) {
-        ground.style.height = (currentHeight + 0.05) + "px";
+    function applySnowVisibility() {
+        const display = snowEnabled ? "block" : "none";
+        document.getElementById("snow-back").style.display = display;
+        document.getElementById("snow-mid").style.display = display;
+        document.getElementById("snow-front").style.display = display;
+        document.getElementById("snow-ground").style.display = display;
     }
 
-    requestAnimationFrame(growGroundLayer);
+
+    animate();
 }
 
-
-window.addEventListener("load", () => {
-    startSnowfallDepthPhysics();
-    growGroundLayer();
-});
+window.addEventListener("load", startSnowOptimised);

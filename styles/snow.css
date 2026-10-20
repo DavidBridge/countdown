@@ -1,3 +1,7 @@
+/* --------------------------------------------------------------------------------
+   Make snow on an HTML page - copyright David Bridge 2026 CSS for snow flakes
+-------------------------------------------------------------------------------- */
+
 /* Snow container sits behind everything */
 #snowfall {
     position: fixed;
