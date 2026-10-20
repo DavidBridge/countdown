@@ -4,7 +4,7 @@
   Countdown PWA Service Worker
 --------------------------------------------------------- */
 
-const CACHE_NAME = "trip-countdown-v5";   // bump this on every update
+const CACHE_NAME = "trip-countdown-v6";   // bump this on every update
 
 const ASSETS = [
     "/countdown/",
@@ -18,7 +18,6 @@ const ASSETS = [
     "/countdown/scripts/snow.js",
 
     "/countdown/styles/countdown.css",
-    "/countdown/styles/settings.css",
     "/countdown/styles/snow.css",
 
     "/countdown/assets/icon-192.png",
