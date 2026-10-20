@@ -8,6 +8,16 @@ const trips = loadUserTrips()
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
 
+function enrichTrips() {
+    const now = new Date();
+
+    trips.forEach(trip => {
+        trip.days = "-";
+        trip.hhmm = "-";
+    });
+}
+
+
 // ------------------------------------------------------------
 // Render trip cards dynamically
 // ------------------------------------------------------------
@@ -116,6 +126,7 @@ window.addEventListener("load", () => {
     document.body.style.backgroundAttachment = "fixed";
 });
 
+enrichTrips();
 renderTrips();
 setInterval(updateCountdowns, 1000);
 
