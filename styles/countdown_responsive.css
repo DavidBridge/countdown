@@ -1,0 +1,191 @@
+/* --- GLOBAL --- */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100dvh;
+    /* dynamic viewport */
+    box-sizing: border-box;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* --- PAGE LAYOUT --- */
+
+#page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100dvh;
+}
+
+#contentArea {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* --- TRIP CONTAINER (RESTORED) --- */
+
+#tripContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* --- TRIP CARD (RESTORED + RESPONSIVE) --- */
+
+.trip-card {
+    background: rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(3px);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    color: white;
+
+    /* responsive flex behaviour */
+    flex: 1 1 clamp(280px, 80vw, 500px);
+    max-width: 600px;
+
+    text-shadow:
+        0 0 3px rgba(0, 0, 0, 0.6),
+        0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+/* --- TYPOGRAPHY (RESPONSIVE) --- */
+
+#mainHeading {
+    width: 100%;
+    text-align: center;
+    font-size: clamp(2rem, 6vw, 4rem);
+    color: red;
+    text-shadow: 3px 3px 6px black;
+    margin: 20px 0;
+}
+
+.trip-name {
+    font-size: clamp(1.6rem, 5vw, 3rem);
+    margin-bottom: 10px;
+    color: yellow;
+}
+
+.trip-location {
+    font-size: clamp(1.6rem, 5vw, 3rem);
+    margin-bottom: 10px;
+    color: green;
+}
+
+.trip-days {
+    font-size: clamp(1.2rem, 4vw, 2.2rem);
+    margin-bottom: 5px;
+    color: yellow;
+}
+
+.trip-hhmm {
+    font-size: clamp(1rem, 3.5vw, 1.6rem);
+    margin-bottom: 5px;
+    color: yellow;
+}
+
+.trip-departure {
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
+    margin-bottom: 5px;
+    color: green;
+}
+
+/* --- TIMER PANEL --- */
+
+.timer {
+    text-align: center;
+    padding: 20px;
+    flex: 1 1 300px;
+    min-width: 260px;
+    color: yellow;
+    text-shadow: 2px 2px 4px black;
+}
+
+/* --- SETTINGS BUTTON --- */
+
+#openSettings {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: calc(20px + env(safe-area-inset-left));
+    padding: 10px 16px;
+    font-size: 16px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* --- BREAKPOINTS --- */
+
+/* Phones (S25 Ultra) */
+@media (max-width: 600px) {
+    #tripContainer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Tablets */
+@media (min-width: 601px) and (max-width: 1024px) {
+    #tripContainer {
+        justify-content: space-around;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+    #tripContainer {
+        justify-content: space-evenly;
+    }
+}
+
+/* --- ORIENTATION (kept) --- */
+
+@media (orientation: portrait) {
+    #container {
+        flex-direction: column;
+    }
+}
+
+@media (orientation: landscape) {
+    #container {
+        flex-direction: row;
+    }
+}
+
+/* --- PANEL ANIMATION --- */
+
+.panel {
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 20px;
+    padding: 25px 35px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 0px rgba(255, 255, 255, 0.0);
+    }
+
+    50% {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 255, 255, 0.55);
+    }
+
+    100% {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 0px rgba(255, 255, 255, 0.0);
+    }
+}
