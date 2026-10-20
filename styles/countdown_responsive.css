@@ -10,7 +10,7 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-attachment: scroll;
 }
 
 /* --- PAGE LAYOUT --- */
@@ -53,7 +53,8 @@ body {
     /* responsive flex behaviour */
     flex: 1 1 clamp(280px, 80vw, 500px);
     max-width: 600px;
-
+    max-height: 80vh;
+    overflow: hidden;
     text-shadow:
         0 0 3px rgba(0, 0, 0, 0.6),
         0 0 6px rgba(0, 0, 0, 0.4);
@@ -162,6 +163,17 @@ body {
 @media (orientation: landscape) {
     #container {
         flex-direction: row;
+    }
+}
+
+@media (max-width: 480px) {
+    #tripContainer {
+        flex-direction: column;
+    }
+
+    .trip-card {
+        flex: 1 1 auto;
+        max-width: 100%;
     }
 }
 

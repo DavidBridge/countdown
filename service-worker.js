@@ -2,7 +2,7 @@
 // Trip Countdown PWA Service Worker
 // ------------------------------------------------------------
 
-const CACHE_NAME = "trip-countdown-v1";
+const CACHE_NAME = "trip-countdown-v1.01";
 
 // All static assets required for offline operation
 const ASSETS = [
