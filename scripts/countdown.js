@@ -104,48 +104,6 @@ function updateCountdowns() {
 
 
 
-
-
-
-// ------------------------------------------------------------
-// Compute and update countdowns every second
-// ------------------------------------------------------------
-// function updateCountdowns() {
-//     const now = new Date();
-
-//     trips.forEach(trip => {
-//         const target = new Date(trip.departure);
-//         const diff = target - now;
-
-//         const daysEl = document.querySelector(`.trip-card[data-id="${trip.id}"] .trip-days`);
-//         const hhmmEl = document.querySelector(`.trip-card[data-id="${trip.id}"] .trip-hhmm`);
-
-
-//         if (diff <= 0) {
-//             trip.days = 0;
-//             trip.hhmm = "00:00:00";
-//             trip.departureLocal = target.toLocaleString();
-
-//             daysEl.textContent = "0";
-//             hhmmEl.textContent = "00:00:00";
-//             return;
-//         }
-
-//         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-//         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-//         const mins = Math.floor((diff / (1000 * 60)) % 60);
-//         const secs = Math.floor((diff / 1000) % 60);
-
-//         trip.days = `${String(days)} days`;
-//         trip.hhmm = `+ ${String(hours)} hours, ${String(mins)} minutes and ${String(secs)} seconds`;
-
-//         // Update DOM
-//         daysEl.textContent = trip.days;
-//         hhmmEl.textContent = trip.hhmm;
-//     });
-// }
-
-
 // ------------------------------------------------------------
 // Initialise page
 // ------------------------------------------------------------

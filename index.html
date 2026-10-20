@@ -25,6 +25,8 @@
         </div>
     </div>
 
+    <button id="openSettings">Settings</button>
+
     <script src="scripts/data.js"></script>
     <script src="scripts/countdown.js"></script>
     <script src="scripts/snow2.js"></script>
@@ -33,6 +35,10 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("/countdown/service-worker.js");
         }
+
+        document.getElementById("openSettings").addEventListener("click", () => {
+            window.location.href = "settings.html";
+        });
     </script>
 </body>
 

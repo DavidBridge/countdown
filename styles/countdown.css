@@ -47,6 +47,22 @@ body {
     margin: 20px 0;
 }
 
+#openSettings {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 16px;
+    font-size: 16px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 1000;
+    /* above snow */
+}
+
+
 #tripContainer {
     display: flex;
     flex-wrap: wrap;
