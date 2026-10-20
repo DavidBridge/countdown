@@ -2,7 +2,7 @@
 // Trip Countdown PWA Service Worker (Corrected Version)
 // ------------------------------------------------------------
 
-const CACHE_NAME = "trip-countdown-v2";   // bump this on every update
+const CACHE_NAME = "trip-countdown-v3";   // bump this on every update
 
 const ASSETS = [
     "/countdown/",

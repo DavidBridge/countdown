@@ -44,7 +44,7 @@ function renderTrips() {
             <div class="trip-location">${trip.location}</div>
             <div class="trip-days">${trip.days} days</div>
             <div class="trip-hhmm">${trip.hhmm}</div>
-            <div class="trip-departure">${departureLocal}</div>
+            <div class="trip-departure">Departure date ${departureLocal}</div>
         `;
 
         container.appendChild(card);

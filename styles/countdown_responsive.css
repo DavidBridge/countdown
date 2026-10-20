@@ -78,9 +78,9 @@ body {
 }
 
 .trip-location {
-    font-size: clamp(1.6rem, 5vw, 3rem);
+    font-size: clamp(1.3rem, 3vw, 2rem);
     margin-bottom: 10px;
-    color: green;
+    color: #9fffd0;
 }
 
 .trip-days {
@@ -96,9 +96,9 @@ body {
 }
 
 .trip-departure {
-    font-size: clamp(1rem, 3.5vw, 1.5rem);
+    font-size: clamp(1rem, 1.0vw, 1.4rem);
     margin-bottom: 5px;
-    color: green;
+    color: #9fffd0;
 }
 
 /* --- TIMER PANEL --- */
